@@ -1,100 +1,109 @@
 // Main Application
 class DigitalCitizenApp {
-    constructor() {
-        this.userProgress = {
-            completedLessons: [],
-            scores: {},
-            totalScore: 0,
-            userName: ''
-        };
-        this.loadProgress();
+  constructor() {
+    this.userProgress = {
+      completedLessons: [],
+      scores: {},
+      totalScore: 0,
+      userName: "",
+    };
+    this.loadProgress();
+  }
+
+  init() {
+    this.renderLessons();
+    this.updateProgressBar();
+  }
+
+  loadProgress() {
+    const saved = localStorage.getItem("digitalCitizenProgress");
+    if (saved) {
+      this.userProgress = JSON.parse(saved);
     }
+  }
 
-    init() {
-        this.renderLessons();
-        this.updateProgressBar();
+  saveProgress() {
+    localStorage.setItem(
+      "digitalCitizenProgress",
+      JSON.stringify(this.userProgress)
+    );
+  }
+
+  updateProgress(lessonId, score) {
+    if (!this.userProgress.completedLessons.includes(lessonId)) {
+      this.userProgress.completedLessons.push(lessonId);
     }
+    this.userProgress.scores[lessonId] = score;
 
-    loadProgress() {
-        const saved = localStorage.getItem('digitalCitizenProgress');
-        if (saved) {
-            this.userProgress = JSON.parse(saved);
-        }
+    // Calculate total score
+    const scores = Object.values(this.userProgress.scores);
+    this.userProgress.totalScore =
+      scores.length > 0
+        ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+        : 0;
+
+    this.saveProgress();
+    this.updateProgressBar();
+
+    // Check for certificate
+    if (
+      this.userProgress.completedLessons.length === LESSONS_DATA.length &&
+      this.userProgress.totalScore >= 80
+    ) {
+      setTimeout(() => this.showCertificate(), 1000);
     }
+  }
 
-    saveProgress() {
-        localStorage.setItem('digitalCitizenProgress', JSON.stringify(this.userProgress));
-    }
+  updateProgressBar() {
+    const completed = this.userProgress.completedLessons.length;
+    const total = LESSONS_DATA.length;
+    const percentage = (completed / total) * 100;
 
-    updateProgress(lessonId, score) {
-        if (!this.userProgress.completedLessons.includes(lessonId)) {
-            this.userProgress.completedLessons.push(lessonId);
-        }
-        this.userProgress.scores[lessonId] = score;
-        
-        // Calculate total score
-        const scores = Object.values(this.userProgress.scores);
-        this.userProgress.totalScore = scores.length > 0 
-            ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) 
-            : 0;
-        
-        this.saveProgress();
-        this.updateProgressBar();
+    const progressFill = document.getElementById("progressFill");
+    const progressStats = document.getElementById("progressStats");
+    const totalScore = document.getElementById("totalScore");
 
-        // Check for certificate
-        if (this.userProgress.completedLessons.length === LESSONS_DATA.length && 
-            this.userProgress.totalScore >= 80) {
-            setTimeout(() => this.showCertificate(), 1000);
-        }
-    }
+    if (progressFill) progressFill.style.width = percentage + "%";
+    if (progressStats) progressStats.textContent = `${completed}/${total} บท`;
+    if (totalScore) totalScore.textContent = this.userProgress.totalScore;
+  }
 
-    updateProgressBar() {
-        const completed = this.userProgress.completedLessons.length;
-        const total = LESSONS_DATA.length;
-        const percentage = (completed / total) * 100;
+  renderLessons() {
+    const grid = document.getElementById("lessonsGrid");
+    if (!grid) return;
 
-        const progressFill = document.getElementById('progressFill');
-        const progressStats = document.getElementById('progressStats');
-        const totalScore = document.getElementById('totalScore');
+    grid.innerHTML = "";
 
-        if (progressFill) progressFill.style.width = percentage + '%';
-        if (progressStats) progressStats.textContent = `${completed}/${total} บท`;
-        if (totalScore) totalScore.textContent = this.userProgress.totalScore;
-    }
+    LESSONS_DATA.forEach((lesson, index) => {
+      const isCompleted = this.userProgress.completedLessons.includes(lesson.id);
 
-    renderLessons() {
-        const grid = document.getElementById('lessonsGrid');
-        if (!grid) return;
+      // Unlock all lessons: remove locking logic so every lesson is accessible
+      const card = document.createElement("div");
+      card.className = "lesson-card";
 
-        grid.innerHTML = '';
+      // Make every card clickable (open lesson modal)
+      card.onclick = () => this.openLesson(lesson.id);
 
-        LESSONS_DATA.forEach((lesson, index) => {
-            const isCompleted = this.userProgress.completedLessons.includes(lesson.id);
-            const isLocked = index > 0 && !this.userProgress.completedLessons.includes(LESSONS_DATA[index - 1].id);
-            
-            const card = document.createElement('div');
-            card.className = `lesson-card ${isLocked ? 'locked' : ''}`;
-            
-            if (!isLocked) {
-                card.onclick = () => this.openLesson(lesson.id);
-            }
+      let status = "";
+      if (isCompleted) {
+        status = `<span class="lesson-status completed">✓ เรียนจบแล้ว</span>`;
+      } else {
+        // No locking: show available for all non-completed lessons
+        status = `<span class="lesson-status available">▶ เริ่มเรียน</span>`;
+      }
 
-            let status = '';
-            if (isCompleted) {
-                status = `<span class="lesson-status completed">✓ เรียนจบแล้ว</span>`;
-            } else if (isLocked) {
-                status = `<span class="lesson-status locked">🔒 ล็อค</span>`;
-            } else {
-                status = `<span class="lesson-status available">▶ เริ่มเรียน</span>`;
-            }
+      const scoreDisplay = isCompleted
+        ? `<span class="lesson-score">คะแนน: ${
+            this.userProgress.scores[lesson.id]
+          }%</span>`
+        : "";
 
-            const scoreDisplay = isCompleted 
-                ? `<span class="lesson-score">คะแนน: ${this.userProgress.scores[lesson.id]}%</span>`
-                : '';
-
-            card.innerHTML = `
+      card.innerHTML = `
                 <div class="lesson-header">
-                    <div class="lesson-number">${String(lesson.id).padStart(2, '0')}</div>
+                    <div class="lesson-number">${String(lesson.id).padStart(
+                      2,
+                      "0"
+                    )}</div>
                     <div class="lesson-icon">${lesson.icon}</div>
                 </div>
                 <h3 class="lesson-title">${lesson.title}</h3>
@@ -105,50 +114,57 @@ class DigitalCitizenApp {
                 </div>
             `;
 
-            grid.appendChild(card);
-        });
-    }
+      grid.appendChild(card);
+    });
+  }
 
-    openLesson(lessonId) {
-        const lesson = LESSONS_DATA.find(l => l.id === lessonId);
-        if (!lesson) return;
+  openLesson(lessonId) {
+    const lesson = LESSONS_DATA.find((l) => l.id === lessonId);
+    if (!lesson) return;
 
-        const modal = document.getElementById('modal');
-        const modalContent = document.getElementById('modalContent');
+    const modal = document.getElementById("modal");
+    const modalContent = document.getElementById("modalContent");
 
-        modalContent.innerHTML = `
+    modalContent.innerHTML = `
             <div class="lesson-content">
                 ${lesson.content}
             </div>
         `;
 
-        // Add quiz
-        const quizSection = quizManager.renderQuiz(lesson.quiz, lessonId);
-        modalContent.appendChild(quizSection);
+    // Add quiz
+    const quizSection = quizManager.renderQuiz(lesson.quiz, lessonId);
+    modalContent.appendChild(quizSection);
 
-        modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
+    modal.classList.add("active");
+    document.body.style.overflow = "hidden";
+
+    // Initialize game if exists
+    if (lesson.hasGame && lesson.gameId) {
+      setTimeout(() => {
+        passwordBallGame.init(lesson.gameId);
+      }, 100);
+    }
+  }
+
+  showCertificate() {
+    let userName = this.userProgress.userName;
+    if (!userName) {
+      userName = prompt("กรุณาใส่ชื่อของคุณสำหรับใบประกาศนียบัตร:", "");
+      if (!userName) return;
+      this.userProgress.userName = userName;
+      this.saveProgress();
     }
 
-    showCertificate() {
-        let userName = this.userProgress.userName;
-        if (!userName) {
-            userName = prompt('กรุณาใส่ชื่อของคุณสำหรับใบประกาศนียบัตร:', '');
-            if (!userName) return;
-            this.userProgress.userName = userName;
-            this.saveProgress();
-        }
+    const today = new Date().toLocaleDateString("th-TH", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
 
-        const today = new Date().toLocaleDateString('th-TH', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
+    const certificateModal = document.getElementById("certificateModal");
+    const certificateContent = document.getElementById("certificateContent");
 
-        const certificateModal = document.getElementById('certificateModal');
-        const certificateContent = document.getElementById('certificateContent');
-
-        certificateContent.innerHTML = `
+    certificateContent.innerHTML = `
             <div class="certificate">
                 <h2>ใบประกาศนียบัตร</h2>
                 <p class="certificate-text">ขอมอบให้</p>
@@ -176,34 +192,34 @@ class DigitalCitizenApp {
             </div>
         `;
 
-        certificateModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
+    certificateModal.classList.add("active");
+    document.body.style.overflow = "hidden";
+  }
 }
 
 // Global Functions
 function closeModal() {
-    const modal = document.getElementById('modal');
-    modal.classList.remove('active');
-    document.body.style.overflow = 'auto';
+  const modal = document.getElementById("modal");
+  modal.classList.remove("active");
+  document.body.style.overflow = "auto";
 }
 
 function closeCertificateModal() {
-    const modal = document.getElementById('certificateModal');
-    modal.classList.remove('active');
-    document.body.style.overflow = 'auto';
+  const modal = document.getElementById("certificateModal");
+  modal.classList.remove("active");
+  document.body.style.overflow = "auto";
 }
 
 // Initialize App
 const app = new DigitalCitizenApp();
-document.addEventListener('DOMContentLoaded', () => {
-    app.init();
+document.addEventListener("DOMContentLoaded", () => {
+  app.init();
 });
 
 // Close modal on escape key
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        closeModal();
-        closeCertificateModal();
-    }
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    closeModal();
+    closeCertificateModal();
+  }
 });

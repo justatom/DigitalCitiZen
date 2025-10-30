@@ -1333,6 +1333,10 @@ const LESSONS_DATA = [
                 <li><strong>แข็งแรง:</strong> <code>P@ssw0rd123!</code> - แตกได้ในหลายวัน</li>
                 <li><strong>แข็งแรงมาก:</strong> <code>Th!s1sMyP@ssw0rd#2025</code> - แตกได้ในหลายปี</li>
             </ul>
+            
+            <h2>กิจกรรม: เกมบอลรหัสผ่าน</h2>
+            <p>ลองเล่นเกมเพื่อฝึกความเข้าใจเกี่ยวกับรหัสผ่านที่ปลอดภัย — เลือกบอล 5 ลูกที่เป็นข้อเท็จจริงเรื่องรหัสผ่านที่ดี แล้วใส่ลงในกล่อง จากนั้นกด <strong>ตรวจคำตอบ</strong> เพื่อดูผลลัพธ์</p>
+            <div id="passwordBallGameContainer"></div>
         `,
         quiz: [
             {
@@ -1371,7 +1375,9 @@ const LESSONS_DATA = [
                     { left: 'แทนที่ตัวอักษร', right: 'P@ssw0rd' }
                 ]
             }
-        ]
+        ],
+        hasGame: true,
+        gameId: 'passwordBallGameContainer'
     }
 ];
 

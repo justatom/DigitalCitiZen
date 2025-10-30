@@ -630,6 +630,31 @@ body {
     box-shadow: 0 0 10px rgba(255, 0, 110, 0.3);
 }
 
+/* Visual states for matching feedback */
+.match-item.matched {
+    border-color: var(--accent-primary);
+    background: linear-gradient(135deg, rgba(0, 255, 249, 0.06), rgba(189, 0, 255, 0.03));
+    box-shadow: 0 0 12px rgba(0, 255, 249, 0.12);
+}
+
+.match-item.correct {
+    border-color: var(--success);
+    background: rgba(0, 255, 136, 0.06);
+    box-shadow: 0 0 12px rgba(0, 255, 136, 0.12);
+}
+
+.match-item.incorrect {
+    border-color: var(--error);
+    background: rgba(255, 0, 85, 0.06);
+    box-shadow: 0 0 12px rgba(255, 0, 85, 0.12);
+}
+
+.match-item.missed {
+    border-color: var(--warning);
+    background: rgba(255, 170, 0, 0.06);
+    opacity: 0.9;
+}
+
 /* ===== Fill Input ===== */
 .fill-blank-input {
     padding: 0.6rem 1rem;
@@ -859,5 +884,346 @@ input[type="checkbox"]:checked::after {
     
     .score-number {
         font-size: 3rem;
+    }
+}
+
+/* เพิ่มที่ท้ายไฟล์ style.css */
+
+/* ===== Password Ball Game ===== */
+.password-ball-game {
+    margin: var(--space-lg) 0;
+    padding: var(--space-lg);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+}
+
+.game-header {
+    text-align: center;
+    margin-bottom: var(--space-lg);
+}
+
+.game-header h3 {
+    color: var(--accent-primary);
+    margin-bottom: var(--space-sm);
+    font-size: 1.5rem;
+}
+
+.game-header p {
+    color: var(--text-secondary);
+    margin-bottom: var(--space-md);
+}
+
+.score-counter {
+    display: inline-block;
+    padding: 0.5rem 1.5rem;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    border-radius: 20px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--bg-primary);
+}
+
+.selected-count {
+    font-size: 1.5rem;
+}
+
+.ball-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.password-ball {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: var(--space-md);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.password-ball:hover {
+    border-color: var(--accent-primary);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 255, 249, 0.3);
+}
+
+.ball-number {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--bg-primary);
+    font-size: 0.9rem;
+}
+
+.ball-text {
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.password-ball.selected {
+    border-color: var(--accent-primary);
+    background: rgba(0, 255, 249, 0.1);
+    box-shadow: 0 0 20px rgba(0, 255, 249, 0.3);
+}
+
+.password-ball.correct-ball {
+    border-color: var(--success);
+    background: rgba(0, 255, 136, 0.1);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+}
+
+.password-ball.wrong-ball {
+    border-color: var(--error);
+    background: rgba(255, 0, 85, 0.1);
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.3);
+}
+
+.password-ball.missed-ball {
+    border-color: var(--warning);
+    background: rgba(255, 170, 0, 0.1);
+    opacity: 0.7;
+}
+
+.box-container {
+    margin-bottom: var(--space-lg);
+}
+
+.password-box {
+    background: var(--bg-secondary);
+    border: 3px dashed var(--accent-primary);
+    border-radius: 12px;
+    padding: var(--space-md);
+    min-height: 200px;
+}
+
+.box-title {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+    margin-bottom: var(--space-md);
+}
+
+.box-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.empty-box {
+    text-align: center;
+    color: var(--text-muted);
+    padding: var(--space-xl);
+    font-style: italic;
+}
+
+.selected-ball-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    background: rgba(0, 255, 249, 0.1);
+    border: 1px solid var(--accent-primary);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.selected-ball-item:hover {
+    background: rgba(0, 255, 249, 0.2);
+}
+
+.ball-mini {
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--bg-primary);
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+
+.ball-mini-text {
+    flex: 1;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.remove-btn {
+    width: 28px;
+    height: 28px;
+    background: var(--error);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.remove-btn:hover {
+    background: #ff3366;
+    transform: scale(1.1);
+}
+
+.game-actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.game-actions .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.game-result {
+    margin-top: var(--space-lg);
+}
+
+.result-card {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: var(--space-lg);
+    text-align: center;
+}
+
+.result-card.perfect {
+    border-color: var(--success);
+    background: rgba(0, 255, 136, 0.05);
+}
+
+.result-card.good {
+    border-color: var(--accent-primary);
+    background: rgba(0, 255, 249, 0.05);
+}
+
+.result-card.try-again {
+    border-color: var(--warning);
+    background: rgba(255, 170, 0, 0.05);
+}
+
+.result-score {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--space-md);
+}
+
+.score-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 30px rgba(0, 255, 249, 0.5);
+}
+
+.score-number {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--bg-primary);
+}
+
+.result-card h3 {
+    color: var(--accent-primary);
+    margin-bottom: var(--space-sm);
+    font-size: 1.8rem;
+}
+
+.result-card > p {
+    color: var(--text-secondary);
+    margin-bottom: var(--space-md);
+}
+
+.result-section {
+    text-align: left;
+    margin-top: var(--space-md);
+    padding: var(--space-md);
+    border-radius: 8px;
+}
+
+.correct-section {
+    background: rgba(0, 255, 136, 0.05);
+    border-left: 4px solid var(--success);
+}
+
+.wrong-section {
+    background: rgba(255, 0, 85, 0.05);
+    border-left: 4px solid var(--error);
+}
+
+.missed-section {
+    background: rgba(255, 170, 0, 0.05);
+    border-left: 4px solid var(--warning);
+}
+
+.result-section h4 {
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+    font-size: 1.1rem;
+}
+
+.result-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.result-section li {
+    padding: var(--space-xs) 0;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.result-section strong {
+    color: var(--accent-primary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .ball-container {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: var(--space-sm);
+    }
+    
+    .password-ball {
+        min-height: 100px;
+        padding: var(--space-sm);
+    }
+    
+    .ball-text {
+        font-size: 0.85rem;
     }
 }
