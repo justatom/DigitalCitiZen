@@ -135,13 +135,58 @@ class DigitalCitizenApp {
     const quizSection = quizManager.renderQuiz(lesson.quiz, lessonId);
     modalContent.appendChild(quizSection);
 
+    // Add Fun Facts section for lesson 1
+    if (lessonId === 1) {
+      const funFactsSection = document.createElement('div');
+      funFactsSection.innerHTML = `
+        <div class="fun-facts">
+          <h2>Fun Facts: พฤติกรรมการแชร์ของคนไทย</h2>
+          <div class="fun-facts-grid">
+              <div class="fact-card">
+                  <div class="fact-stat">53%+</div>
+                  <div class="fact-text">คนไทยพบแบรนด์ใหม่ ๆ จากการแชร์ในโซเชียลมีเดีย</div>
+                  <div class="fact-detail">เมื่อโพสต์ "ไวรัล" ถูกแชร์ต่อหลาย ๆ ครั้ง สามารถทำให้แบรนด์หรือบุคคลดังแบบข้ามคืนได้ทันที</div>
+              </div>
+              <div class="fact-card">
+                  <div class="fact-stat">56.9%</div>
+                  <div class="fact-text">แชร์โพสต์เพื่อติดต่อกับเพื่อนและครอบครัว</div>
+                  <div class="fact-detail">สถิติปี 2025 พบว่าผู้ใช้งานส่วนใหญ่แชร์หรือพูดคุยความคิดเห็นกับผู้อื่นบนโซเชียลเพื่อการเชื่อมต่อกัน</div>
+              </div>
+              <div class="fact-card">
+                  <div class="fact-stat">29.7%</div>
+                  <div class="fact-text">แชร์โพสต์เพื่อแบ่งปันหรือถกเถียงความคิดเห็น</div>
+                  <div class="fact-detail">คนไทยนิยมแชร์ข่าวสาร ความรู้ และแรงบันดาลใจมากกว่าการแสดงความคิดเห็นส่วนตัว</div>
+              </div>
+              <div class="fact-card">
+                  <div class="fact-stat">18:00-20:00</div>
+                  <div class="fact-text">"ช่วงเวลาทอง" สำหรับการโพสต์ในวันศุกร์</div>
+                  <div class="fact-detail">โพสต์ในช่วงนี้จะถูกแชร์และมองเห็นมากกว่าเวลาปกติ เพราะคนส่วนใหญ่ใช้โซเชียลหลังเลิกงานหรือก่อนพักผ่อน</div>
+              </div>
+              <div class="fact-card">
+                  <div class="fact-stat">2:30+ ชม.</div>
+                  <div class="fact-text">เวลาเฉลี่ยต่อวันที่คนไทยใช้บน social network</div>
+                  <div class="fact-detail">คนไทยโดยเฉลี่ยใช้ social network รวม 7 แพลตฟอร์ม/บุคคล ต่อเดือน</div>
+              </div>
+          </div>
+        </div>
+      `;
+      modalContent.appendChild(funFactsSection);
+    }
+
     modal.classList.add("active");
     document.body.style.overflow = "hidden";
 
     // Initialize game if exists
     if (lesson.hasGame && lesson.gameId) {
       setTimeout(() => {
-        passwordBallGame.init(lesson.gameId);
+        if (lesson.gameId === 'passwordBallGameContainer' && typeof passwordBallGame !== 'undefined') {
+          passwordBallGame.init(lesson.gameId);
+        } else if (lesson.gameId === 'shareSortGameContainer' && typeof shareSortGame !== 'undefined') {
+          shareSortGame.init(lesson.gameId);
+        } else if (typeof passwordBallGame !== 'undefined') {
+          // fallback to passwordBallGame if available
+          passwordBallGame.init(lesson.gameId);
+        }
       }, 100);
     }
   }

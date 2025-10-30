@@ -590,3 +590,205 @@ class PasswordBallGame {
 }
 
 const passwordBallGame = new PasswordBallGame();
+
+// ShareSortGame - แยกสิ่งที่ควรแชร์และไม่ควรแชร์
+class ShareSortGame {
+    constructor() {
+        this.balls = [
+            { id: 1, text: 'ไม่แชร์รหัสผ่านหรือข้อมูลสำคัญ', correctBox: 'dontShare' },
+            { id: 2, text: 'แชร์รูปท่องเที่ยวหลังกลับบ้าน', correctBox: 'share' },
+            { id: 3, text: 'โพสต์ที่อยู่บ้าน', correctBox: 'dontShare' },
+            { id: 4, text: 'แชร์งานศิลปะหรือผลงานที่เสร็จแล้ว', correctBox: 'share' },
+            { id: 5, text: 'แชร์เบอร์โทรศัพท์ของผู้อื่นโดยไม่ได้รับอนุญาต', correctBox: 'dontShare' },
+            { id: 6, text: 'แชร์รูปสัตว์เลี้ยงหรืองานอดิเรก', correctBox: 'share' },
+            { id: 7, text: 'โพสต์วันเกิดหรือข้อมูลประจำตัวที่ละเอียด', correctBox: 'dontShare' },
+            { id: 8, text: 'แชร์ลิงก์บทความที่ดี', correctBox: 'share' },
+            { id: 9, text: 'แชร์รหัสผ่านหรือรหัส OTP', correctBox: 'dontShare' },
+            { id: 10, text: 'แชร์รูปทีมกีฬา/กิจกรรมที่ไม่มีข้อมูลส่วนตัว', correctBox: 'share' }
+        ];
+        this.assignments = {}; // ballId -> 'share' | 'dontShare'
+        this.shuffledBalls = [];
+        this.containerId = null;
+    }
+
+    init(containerId) {
+        this.containerId = containerId;
+        this.shuffledBalls = [...this.balls].sort(() => Math.random() - 0.5);
+        this.assignments = {};
+        this.render(containerId);
+    }
+
+    render(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        container.innerHTML = `
+            <div class="share-sort-game">
+                <div class="game-header">
+                    <h3>🎯 เกมแยกสิ่งที่แชร์ได้และไม่ควรแชร์</h3>
+                    <p>ย้ายบอลแต่ละลูกไปยังกล่องที่เหมาะสม: "แชร์ได้" หรือ "ไม่ควรแชร์"</p>
+                </div>
+
+                <div class="boxes">
+                    <div class="share-box" id="${containerId}-shareBox">
+                        <div class="box-title">🔓 แชร์ได้</div>
+                        <div class="box-content"></div>
+                    </div>
+                    <div class="share-box" id="${containerId}-dontShareBox">
+                        <div class="box-title">🔒 ไม่ควรแชร์</div>
+                        <div class="box-content"></div>
+                    </div>
+                </div>
+
+                <div class="ball-list">
+                    ${this.shuffledBalls.map(ball => `
+                        <div class="share-ball" data-ball-id="${ball.id}" id="${containerId}-ball-${ball.id}">
+                            <div class="ball-text">${ball.text}</div>
+                            <div class="ball-actions">
+                                <button class="btn btn-small" onclick="shareSortGame.assignBall(${ball.id}, 'share')">แชร์</button>
+                                <button class="btn btn-small btn-secondary" onclick="shareSortGame.assignBall(${ball.id}, 'dontShare')">ไม่ควรแชร์</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="game-actions">
+                    <button class="btn" onclick="shareSortGame.checkAnswer()">ตรวจคำตอบ</button>
+                    <button class="btn btn-secondary" onclick="shareSortGame.reset('${containerId}')">เริ่มใหม่</button>
+                </div>
+
+                <div id="${containerId}-result" class="game-result"></div>
+            </div>
+        `;
+
+        this.updateDisplay();
+    }
+
+    assignBall(ballId, box) {
+        this.assignments[ballId] = box;
+        this.updateDisplay();
+    }
+
+    removeAssignment(ballId) {
+        delete this.assignments[ballId];
+        this.updateDisplay();
+    }
+
+    updateDisplay() {
+        const shareBox = document.querySelector(`#${this.containerId}-shareBox .box-content`);
+        const dontShareBox = document.querySelector(`#${this.containerId}-dontShareBox .box-content`);
+        if (!shareBox || !dontShareBox) return;
+
+        // update boxes
+        const shareItems = Object.keys(this.assignments).filter(id => this.assignments[id] === 'share').map(id => parseInt(id));
+        const dontShareItems = Object.keys(this.assignments).filter(id => this.assignments[id] === 'dontShare').map(id => parseInt(id));
+
+        shareBox.innerHTML = shareItems.map(id => {
+            const ball = this.balls.find(b => b.id === id);
+            return `
+                <div class="assigned-item">
+                    <span class="ball-mini">${id}</span>
+                    <span class="ball-mini-text">${ball.text}</span>
+                    <button class="remove-btn" onclick="shareSortGame.removeAssignment(${id})">×</button>
+                </div>
+            `;
+        }).join('') || '<p class="empty-box">ยังไม่มีการวางบอล</p>';
+
+        dontShareBox.innerHTML = dontShareItems.map(id => {
+            const ball = this.balls.find(b => b.id === id);
+            return `
+                <div class="assigned-item">
+                    <span class="ball-mini">${id}</span>
+                    <span class="ball-mini-text">${ball.text}</span>
+                    <button class="remove-btn" onclick="shareSortGame.removeAssignment(${id})">×</button>
+                </div>
+            `;
+        }).join('') || '<p class="empty-box">ยังไม่มีการวางบอล</p>';
+
+        // update ball elements to show assigned state
+        this.shuffledBalls.forEach(ball => {
+            const el = document.getElementById(`${this.containerId}-ball-${ball.id}`);
+            if (!el) return;
+            el.classList.remove('assigned-share', 'assigned-dontshare');
+            if (this.assignments[ball.id] === 'share') el.classList.add('assigned-share');
+            if (this.assignments[ball.id] === 'dontShare') el.classList.add('assigned-dontshare');
+        });
+    }
+
+    checkAnswer() {
+        const total = this.balls.length;
+        let correct = 0;
+        const correctList = [];
+        const wrongList = [];
+
+        this.balls.forEach(ball => {
+            const assigned = this.assignments[ball.id];
+            const expected = ball.correctBox;
+            if (assigned === expected) {
+                correct++;
+                correctList.push(ball.id);
+            } else {
+                wrongList.push(ball.id);
+            }
+        });
+
+        const resultDiv = document.getElementById(`${this.containerId}-result`);
+        if (!resultDiv) return;
+
+        const scoreTitle = correct === total ? '🎉 เยี่ยมมาก!' : correct >= Math.ceil(total * 0.6) ? '👍 ดีมาก!' : '💪 ลองใหม่อีกครั้ง!';
+
+        let html = `
+            <div class="result-card ${correct === total ? 'perfect' : correct >= Math.ceil(total * 0.6) ? 'good' : 'try-again'}">
+                <div class="result-score">
+                    <div class="score-circle"><div class="score-number">${correct}/${total}</div></div>
+                </div>
+                <h3>${scoreTitle}</h3>
+                <p>คุณจัดเรียงถูก ${correct} จาก ${total} ลูก</p>
+            </div>
+        `;
+
+        if (correctList.length > 0) {
+            html += `
+                <div class="result-section correct-section">
+                    <h4>✅ คำตอบที่ถูกต้อง:</h4>
+                    <ul>
+                        ${correctList.map(id => `<li>บอล ${id}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        if (wrongList.length > 0) {
+            html += `
+                <div class="result-section wrong-section">
+                    <h4>❌ คำตอบที่ผิด:</h4>
+                    <ul>
+                        ${wrongList.map(id => `<li>บอล ${id}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        resultDiv.innerHTML = html;
+
+        // visual highlight
+        this.shuffledBalls.forEach(ball => {
+            const el = document.getElementById(`${this.containerId}-ball-${ball.id}`);
+            if (!el) return;
+            el.classList.remove('correct-ball', 'wrong-ball');
+            if (this.assignments[ball.id] === ball.correctBox) {
+                el.classList.add('correct-ball');
+            } else {
+                el.classList.add('wrong-ball');
+            }
+        });
+
+        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    reset(containerId) {
+        this.init(containerId);
+    }
+}
+
+const shareSortGame = new ShareSortGame();
