@@ -21,8 +21,9 @@
     --warning: #ffaa00;
     
     /* Typography */
-    --font-primary: 'Rajdhani', sans-serif;
-    --font-display: 'Orbitron', sans-serif;
+    /* Use Google Font 'Sarabun' for both body and display headings (Thai-friendly) */
+    --font-primary: 'Sarabun', sans-serif;
+    --font-display: 'Sarabun', sans-serif;
     
     /* Spacing */
     --space-xs: 0.5rem;
